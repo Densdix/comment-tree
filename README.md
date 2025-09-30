@@ -2,6 +2,8 @@
 
 VS Code Extension for exploring and navigating all comments in the project through a tree view in the side panel.
 
+![screenshot](resources/preview.jpg)
+
 **⚡ High Performance**: Optimized scanning with comprehensive exclusion rules to skip node_modules, build outputs, and cache directories for fast operation.
 
 ## Features
