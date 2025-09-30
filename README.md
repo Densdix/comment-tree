@@ -23,7 +23,7 @@ VS Code Extension for exploring and navigating all comments in the project throu
 
 ## Installation
 
-1. Download the extension from VS Code Marketplace
+1. Download the extension from VS Code Marketplace or comment-tree-x.x.x.vsix in the releases section of the repository
 2. Install via the `Extensions: Install from VSIX` command (if you have a .vsix file)
 3. Or clone the repository and run `npm install && npm run compile`
 
@@ -38,7 +38,7 @@ VS Code Extension for exploring and navigating all comments in the project throu
 
 ## Settings
 
-Расширение предоставляет следующие настройки в `settings.json`:
+The extension provides the following settings in `settings.json`:
 
 ### `commentExplorer.regex`
 
