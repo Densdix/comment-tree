@@ -1,0 +1,162 @@
+{
+  "name": "comment-tree",
+  "displayName": "Comment Tree",
+  "description": "Explore and navigate all code comments in your project as a tree view.",
+  "version": "0.0.1",
+  "publisher": "test-publisher",
+  "engines": {
+    "vscode": "^1.93.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:comment-tree.refresh",
+    "*"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "comment-tree",
+          "title": "Comment Tree",
+          "icon": "resources/comments.svg"
+        }
+      ]
+    },
+    "views": {
+      "comment-tree": [
+        {
+          "id": "commentTreeView",
+          "name": "Comments"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "comment-tree.refresh",
+        "title": "Refresh Comment Tree",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "comment-tree.testExclusions",
+        "title": "Test Exclusions (Debug)",
+        "icon": "$(check)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "comment-tree.refresh",
+          "when": "view == commentTreeView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Comment Tree",
+      "properties": {
+        "commentExplorer.regex": {
+          "type": "string",
+          "default": "//.*$|/\\*[\\s\\S]*?\\*/|<!--.*?-->|#.*$",
+          "description": "Regular expression for matching comments in code files. Supports multiple comment types like //, /* */, <!-- -->, #"
+        },
+        "commentExplorer.fileExtensions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "ts",
+            "tsx",
+            "js",
+            "jsx",
+            "java",
+            "php",
+            "py",
+            "cs",
+            "html",
+            "css",
+            "scss",
+            "less",
+            "md",
+            "json",
+            "xml",
+            "yaml",
+            "yml"
+          ],
+          "description": "File extensions to include when scanning for comments"
+        },
+        "commentExplorer.exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "**/node_modules/**",
+            "**/dist/**",
+            "**/build/**",
+            "**/out/**",
+            "**/.git/**",
+            "**/.vscode/**",
+            "**/.vscode-test/**",
+            "**/.DS_Store",
+            "**/.next/**",
+            "**/.nuxt/**",
+            "**/.cache/**",
+            "**/.tmp/**",
+            "**/.temp/**",
+            "**/coverage/**",
+            "**/.nyc_output/**",
+            "**/logs/**",
+            "**/vendor/**",
+            "**/test-results/**",
+            "**/.expo/**",
+            "**/.expo-shared/**",
+            "**/android/**",
+            "**/ios/**",
+            "**/.meteor/**",
+            "**/.history/**",
+            "**/.idea/**",
+            "**/*.min.js",
+            "**/*.min.css",
+            "**/*.map"
+          ],
+          "description": "Glob patterns for files and folders to exclude from comment scanning."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "format": "prettier --write \"src/**/*.{ts,js,json}\" \"*.{ts,js,json,md}\"",
+    "format-check": "prettier --check \"src/**/*.{ts,js,json}\" \"*.{ts,js,json,md}\"",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@types/vscode": "^1.93.0",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2",
+    "esbuild": "^0.25.9",
+    "eslint": "^9.34.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2"
+  }
+}

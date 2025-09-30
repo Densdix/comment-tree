@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+out/
+*.vsix
+
+# Generated files
+*.map
+
+# Package files
+package-lock.json
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+.vscode-test/
+
+# Git
+.git/
+
+# Coverage
+coverage/
