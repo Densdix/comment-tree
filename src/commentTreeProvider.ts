@@ -35,9 +35,9 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
 
   constructor() {
     // Listen for configuration changes
-    vscode.workspace.onDidChangeConfiguration((event) => {
+    vscode.workspace.onDidChangeConfiguration(async (event) => {
       if (event.affectsConfiguration(this.configSection)) {
-        this.refresh();
+        await this.refresh();
       }
     });
   }
@@ -45,8 +45,8 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
   /**
    * Updates the comment tree
    */
-  public refresh(): void {
-    this.scanForComments();
+  public async refresh(): Promise<void> {
+    await this.scanForComments();
     this._onDidChangeTreeData.fire(null);
   }
 

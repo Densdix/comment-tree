@@ -8,7 +8,7 @@ export { CommentTreeProvider };
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
   console.log('Comment Tree extension is now active!');
@@ -38,18 +38,16 @@ export function activate(context: vscode.ExtensionContext) {
   });
 
   // Register command for updating the comment tree
-  const refreshCommand = vscode.commands.registerCommand('comment-tree.refresh', () => {
+  const refreshCommand = vscode.commands.registerCommand('comment-tree.refresh', async () => {
     console.log('Refresh command executed');
-    commentTreeProvider.refresh();
+    await commentTreeProvider.refresh();
 
     // Show statistics after updating
-    setTimeout(() => {
-      const stats = commentTreeProvider.getStats();
-      const message = `Found ${stats.totalComments} comment${
-        stats.totalComments !== 1 ? 's' : ''
-      } in ${stats.totalFiles} file${stats.totalFiles !== 1 ? 's' : ''}`;
-      vscode.window.showInformationMessage(message);
-    }, 100);
+    const stats = commentTreeProvider.getStats();
+    const message = `Found ${stats.totalComments} comment${
+      stats.totalComments !== 1 ? 's' : ''
+    } in ${stats.totalFiles} file${stats.totalFiles !== 1 ? 's' : ''}`;
+    vscode.window.showInformationMessage(message);
   });
   console.log('Refresh command registered');
 
@@ -123,7 +121,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   // Start initial scanning if there is a workspace
   if (vscode.workspace.workspaceFolders) {
-    commentTreeProvider.refresh();
+    await commentTreeProvider.refresh();
     showStats();
   }
 
@@ -133,10 +131,10 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(testExclusionsCommand);
 
   // Handle workspace opening/closing event
-  const workspaceFoldersChange = vscode.workspace.onDidChangeWorkspaceFolders((event) => {
+  const workspaceFoldersChange = vscode.workspace.onDidChangeWorkspaceFolders(async (event) => {
     console.log('Workspace folders changed:', event.added.length, 'added,', event.removed.length, 'removed');
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length > 0) {
-      commentTreeProvider.refresh();
+      await commentTreeProvider.refresh();
       showStats();
     }
   });
