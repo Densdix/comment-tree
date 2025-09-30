@@ -4,7 +4,7 @@ VS Code Extension for exploring and navigating all comments in the project throu
 
 **⚡ High Performance**: Optimized scanning with comprehensive exclusion rules to skip node_modules, build outputs, and cache directories for fast operation.
 
-## Возможности
+## Features
 
 - **Collect all types of comments** from project files:
   - Single line comments (`//`, `#`, `--`)
@@ -21,13 +21,13 @@ VS Code Extension for exploring and navigating all comments in the project throu
 - **Update command** for re-scanning
 - **Debug command** to test exclusion rules
 
-## Установка
+## Installation
 
 1. Download the extension from VS Code Marketplace
 2. Install via the `Extensions: Install from VSIX` command (if you have a .vsix file)
 3. Or clone the repository and run `npm install && npm run compile`
 
-## Использование
+## Usage
 
 1. Open the workspace with the project
 2. In the side panel find the "Comments" section
@@ -36,7 +36,7 @@ VS Code Extension for exploring and navigating all comments in the project throu
 5. Use the update button to re-scan comments
 6. Use the "Test Exclusions" command to verify that exclusions are working correctly
 
-## Настройки
+## Settings
 
 Расширение предоставляет следующие настройки в `settings.json`:
 
@@ -81,9 +81,9 @@ The extension provides the following commands:
 - `src/commentTreeProvider.ts` - Data provider for the comment tree
 - `src/commentItem.ts` - Class for representing comments in the tree
 
-## Разработка
+## Development
 
-### Требования
+### Requirements
 
 - Node.js
 - npm
@@ -118,7 +118,7 @@ npm run watch
 npm run test
 ```
 
-## Known limitations
+## Known Limitations
 
 - Maximum 10000 files are scanned at once for performance
 - Some complex regular expressions may work slowly
