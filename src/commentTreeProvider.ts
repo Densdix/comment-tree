@@ -168,6 +168,8 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
       const content = fs.readFileSync(filePath, 'utf8');
       const comments: Comment[] = [];
       const lines = content.split('\n');
+      const lowerCaseFilePath = filePath.toLowerCase();
+      const isMarkdownFile = lowerCaseFilePath.endsWith('.md') || lowerCaseFilePath.endsWith('.markdown');
 
       // Search for single line comments
       for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
@@ -184,15 +186,17 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
           });
         }
 
-        // Search for hash comments
-        const hashMatch = line.match(/^(\s*)#(.*)/);
-        if (hashMatch) {
-          comments.push({
-            filePath,
-            text: `#${hashMatch[2].replace(/\r$/, '')}`,
-            lineNumber: lineIndex + 1,
-            column: hashMatch[1].length,
-          });
+        // Search for hash comments (skip for Markdown files where # denotes headings)
+        if (!isMarkdownFile) {
+          const hashMatch = line.match(/^(\s*)#(.*)/);
+          if (hashMatch) {
+            comments.push({
+              filePath,
+              text: `#${hashMatch[2].replace(/\r$/, '')}`,
+              lineNumber: lineIndex + 1,
+              column: hashMatch[1].length,
+            });
+          }
         }
       }
 
