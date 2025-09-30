@@ -23,7 +23,7 @@ VS Code Extension for exploring and navigating all comments in the project throu
 
 ## Installation
 
-### From VS Code Marketplace (Not Published Yet)
+### From VS Code Marketplace
 
 1. Open VS Code
 2. Go to Extensions (Ctrl+Shift+X)

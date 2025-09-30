@@ -2,7 +2,7 @@
   "name": "comment-tree",
   "displayName": "Comment Tree",
   "description": "Explore and navigate all code comments in your project as a tree view.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "comment-tree",
   "engines": {
     "vscode": "^1.93.0"
@@ -15,6 +15,7 @@
     "url": "https://github.com/Densdix/comment-tree"
   },
   "license": "MIT",
+  "icon": "resources/tree.png",
   "activationEvents": [
     "onStartupFinished"
   ],
