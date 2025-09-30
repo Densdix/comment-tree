@@ -98,7 +98,7 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
       // Set the context for the menu
       item.contextValue = 'fileItem';
 
-      // Сохраняем путь к файлу для использования в getChildren
+      // Save the path to the file for use in getChildren
       (item as any).filePath = file.filePath;
 
       return item;

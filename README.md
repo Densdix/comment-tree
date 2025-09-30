@@ -23,9 +23,21 @@ VS Code Extension for exploring and navigating all comments in the project throu
 
 ## Installation
 
-1. Download the extension from VS Code Marketplace or comment-tree-x.x.x.vsix in the releases section of the repository
-2. Install via the `Extensions: Install from VSIX` command (if you have a .vsix file)
-3. Or clone the repository and run `npm install && npm run compile`
+### From VS Code Marketplace (Not Published Yet)
+
+1. Open VS Code
+2. Go to Extensions (Ctrl+Shift+X)
+3. Search for "Comment Tree"
+4. Click Install
+
+### From VSIX File
+
+1. Download `comment-tree-x.x.x.vsix` from the [Releases](https://github.com/Densdix/comment-tree/releases) section
+2. Open VS Code
+3. Open Command Palette (Ctrl+Shift+P)
+4. Type "Extensions: Install from VSIX"
+5. Select the downloaded `.vsix` file
+6. Click Install
 
 ## Usage
 
