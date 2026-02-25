@@ -165,11 +165,13 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
    */
   private async extractCommentsFromFile(filePath: string, regexPattern: string): Promise<Comment[]> {
     try {
-      const content = fs.readFileSync(filePath, 'utf8');
+      const document = await vscode.workspace.openTextDocument(filePath, { encoding: 'utf8' });
+      const content = document.getText();
       const comments: Comment[] = [];
       const lines = content.split('\n');
       const lowerCaseFilePath = filePath.toLowerCase();
       const isMarkdownFile = lowerCaseFilePath.endsWith('.md') || lowerCaseFilePath.endsWith('.markdown');
+      const languageId = document.languageId;
 
       // Search for single line comments
       for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
@@ -187,7 +189,7 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
         }
 
         // Search for hash comments (skip for Markdown files where # denotes headings)
-        if (!isMarkdownFile) {
+        if (!isMarkdownFile && !["c", "cpp"].includes(languageId)) {
           const hashMatch = line.match(/^(\s*)#(.*)/);
           if (hashMatch) {
             comments.push({
