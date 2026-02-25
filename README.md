@@ -106,8 +106,7 @@ The extension provides the following commands:
 ### Building
 
 ```bash
-npm install
-npm run compile
+npx vsce package
 ```
 
 ### Code formatting
