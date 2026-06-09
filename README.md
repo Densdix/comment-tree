@@ -70,7 +70,15 @@ Array of exclusion patterns for files and folders. By default, excludes common d
 - `**/dist/**`, `**/build/**`, `**/out/**` - Build outputs
 - `**/.git/**`, `**/.vscode/**` - Version control and IDE files
 - `**/.next/**`, `**/.nuxt/**`, `**/.cache/**` - Framework caches
+- `**/venv/**`, `**/.venv/**`, `**/env/**`, `**/.env/**` - Python virtual environments
+- `**/__pycache__/**`, `**/.pytest_cache/**`, `**/.mypy_cache/**` - Python caches
+- `**/.gradle/**` - Gradle build cache
+- `**/.dart_tool/**` - Dart/Flutter tool cache
 - `**/coverage/**`, `**/*.min.js`, `**/*.map` - Generated/test files
+
+### `commentExplorer.useGitignore`
+
+When enabled (default: `true`), files and folders listed in the workspace `.gitignore` will also be excluded from comment scanning. This is useful for automatically skipping virtual environments, build artifacts, and other project-specific directories without needing to configure them manually.
 
 Example settings:
 

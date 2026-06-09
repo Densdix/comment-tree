@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
+import ignore, { Ignore } from 'ignore';
 import { CommentItem } from './commentItem';
 
 /**
@@ -120,8 +121,23 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
   }
 
   /**
-   * Scans the workspace for comments
+   * Reads and parses .gitignore file from a directory
+   * @param dirPath Path to the directory containing .gitignore
+   * @returns An Ignore instance with parsed patterns, or null if .gitignore doesn't exist
    */
+  private loadGitignore(dirPath: string): Ignore | null {
+    const gitignorePath = path.join(dirPath, '.gitignore');
+    try {
+      if (fs.existsSync(gitignorePath)) {
+        const content = fs.readFileSync(gitignorePath, 'utf8');
+        return ignore().add(content);
+      }
+    } catch (error) {
+      console.error(`Error reading .gitignore at ${gitignorePath}:`, error);
+    }
+    return null;
+  }
+
   private async scanForComments(): Promise<void> {
     if (!vscode.workspace.workspaceFolders) {
       this.filesWithComments = [];
@@ -132,6 +148,7 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
     const regexPattern = config.get<string>('regex', '//.*$|/\\*[\\s\\S]*?\\*/|<!--.*?-->|#.*$');
     const fileExtensions = config.get<string[]>('fileExtensions', []);
     const excludePatterns = config.get<string[]>('exclude', []);
+    const useGitignore = config.get<boolean>('useGitignore', true);
 
     // Create glob pattern for including files
     const includePattern = fileExtensions.length > 0 ? `**/*.{${fileExtensions.join(',')}}` : '**/*';
@@ -144,7 +161,19 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
       // Create exclude pattern from the array of patterns
       const excludePattern = excludePatterns.length > 0 ? `{${excludePatterns.join(',')}}` : null;
 
-      const files = await vscode.workspace.findFiles(pattern, excludePattern, 10000);
+      let files = await vscode.workspace.findFiles(pattern, excludePattern, 10000);
+
+      // Filter files using .gitignore patterns
+      if (useGitignore) {
+        const ig = this.loadGitignore(workspaceFolder.uri.fsPath);
+        if (ig) {
+          const workspaceRoot = workspaceFolder.uri.fsPath;
+          files = files.filter((file) => {
+            const relativePath = path.relative(workspaceRoot, file.fsPath);
+            return !ig.ignores(relativePath);
+          });
+        }
+      }
 
       for (const file of files) {
         try {
