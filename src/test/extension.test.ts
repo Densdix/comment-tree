@@ -10,11 +10,11 @@ suite('Comment Tree Extension Test Suite', () => {
 
   suiteSetup(async () => {
     // Wait for extension activation
-    await vscode.extensions.getExtension('test-publisher.comment-tree')?.activate();
+    await vscode.extensions.getExtension('densdix.comment-tree')?.activate();
   });
 
   test('Extension should be activated', () => {
-    const extension = vscode.extensions.getExtension('test-publisher.comment-tree');
+    const extension = vscode.extensions.getExtension('densdix.comment-tree');
     assert.ok(extension, 'Extension should be found');
     assert.strictEqual(extension?.isActive, true, 'Extension should be active');
   });
@@ -30,9 +30,7 @@ suite('Comment Tree Extension Test Suite', () => {
 
     // Create provider for testing
     commentTreeProvider = new CommentTreeProvider();
-
-    // Wait for scanning to complete
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await commentTreeProvider.refresh();
 
     const stats = commentTreeProvider.getStats();
     console.log('Test stats:', stats);
@@ -57,9 +55,7 @@ suite('Comment Tree Extension Test Suite', () => {
 
     // Create provider for testing
     commentTreeProvider = new CommentTreeProvider();
-
-    // Wait for scanning to complete
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await commentTreeProvider.refresh();
 
     const children = await commentTreeProvider.getChildren();
 
@@ -83,7 +79,7 @@ suite('Comment Tree Extension Test Suite', () => {
 
       // Create provider and scan
       commentTreeProvider = new CommentTreeProvider();
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await commentTreeProvider.refresh();
 
       const children = await commentTreeProvider.getChildren();
 
@@ -109,9 +105,7 @@ suite('Comment Tree Extension Test Suite', () => {
 
     // Create provider for testing
     commentTreeProvider = new CommentTreeProvider();
-
-    // Wait for scanning to complete
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await commentTreeProvider.refresh();
 
     const children = await commentTreeProvider.getChildren();
 
@@ -129,9 +123,7 @@ suite('Comment Tree Extension Test Suite', () => {
 
     // Create provider for testing
     commentTreeProvider = new CommentTreeProvider();
-
-    // Wait for scanning to complete
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await commentTreeProvider.refresh();
 
     const children = await commentTreeProvider.getChildren();
 
@@ -149,9 +141,7 @@ suite('Comment Tree Extension Test Suite', () => {
 
     // Create provider for testing
     commentTreeProvider = new CommentTreeProvider();
-
-    // Wait for scanning to complete
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await commentTreeProvider.refresh();
 
     const children = await commentTreeProvider.getChildren();
 
@@ -162,5 +152,87 @@ suite('Comment Tree Extension Test Suite', () => {
     });
 
     assert.ok(hasSrcFiles, 'Should scan files in src directory');
+  });
+
+  test('Should scan C files and ignore preprocessor directives', async function () {
+    this.timeout(5000);
+
+    const testFileUri = vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, 'test-c.c');
+    const fileContent = `#include <stdio.h>\n#define CONST_VAL 42\n\n// This is a C single line comment\nint main() {\n    /* This is a C multi-line comment */\n    return 0;\n}\n`;
+
+    try {
+      await vscode.workspace.fs.writeFile(testFileUri, Buffer.from(fileContent));
+
+      // Create provider and scan
+      commentTreeProvider = new CommentTreeProvider();
+      await commentTreeProvider.refresh();
+
+      const children = await commentTreeProvider.getChildren();
+      const cFileItem = children.find(
+        (child) => (child as any).filePath && (child as any).filePath.endsWith('test-c.c')
+      );
+
+      assert.ok(cFileItem, 'C file should be scanned and found in the tree');
+
+      const fileComments = await commentTreeProvider.getChildren(cFileItem);
+      
+      // We expect exactly 2 comments:
+      // 1. // This is a C single line comment
+      // 2. /* This is a C multi-line comment */
+      assert.strictEqual(fileComments.length, 2, 'Should find exactly 2 comments');
+
+      const texts = fileComments.map((c: any) => c.commentText);
+      assert.ok(texts.some(t => t.includes('// This is a C single line comment')), 'Should find single-line comment');
+      assert.ok(texts.some(t => t.includes('/* This is a C multi-line comment */')), 'Should find multi-line comment');
+      assert.ok(!texts.some(t => t.includes('#include')), 'Should not find #include as comment');
+      assert.ok(!texts.some(t => t.includes('#define')), 'Should not find #define as comment');
+    } finally {
+      try {
+        await vscode.workspace.fs.delete(testFileUri);
+      } catch (error) {
+        // Ignore delete error
+      }
+    }
+  });
+
+  test('Should scan C++ files and ignore preprocessor directives', async function () {
+    this.timeout(5000);
+
+    const testFileUri = vscode.Uri.joinPath(vscode.workspace.workspaceFolders![0].uri, 'test-cpp.cpp');
+    const fileContent = `#include <iostream>\n#pragma once\n\n// This is a C++ single line comment\nint main() {\n    /* This is a C++ multi-line comment */\n    return 0;\n}\n`;
+
+    try {
+      await vscode.workspace.fs.writeFile(testFileUri, Buffer.from(fileContent));
+
+      // Create provider and scan
+      commentTreeProvider = new CommentTreeProvider();
+      await commentTreeProvider.refresh();
+
+      const children = await commentTreeProvider.getChildren();
+      const cppFileItem = children.find(
+        (child) => (child as any).filePath && (child as any).filePath.endsWith('test-cpp.cpp')
+      );
+
+      assert.ok(cppFileItem, 'C++ file should be scanned and found in the tree');
+
+      const fileComments = await commentTreeProvider.getChildren(cppFileItem);
+
+      // We expect exactly 2 comments:
+      // 1. // This is a C++ single line comment
+      // 2. /* This is a C++ multi-line comment */
+      assert.strictEqual(fileComments.length, 2, 'Should find exactly 2 comments');
+
+      const texts = fileComments.map((c: any) => c.commentText);
+      assert.ok(texts.some(t => t.includes('// This is a C++ single line comment')), 'Should find single-line comment');
+      assert.ok(texts.some(t => t.includes('/* This is a C++ multi-line comment */')), 'Should find multi-line comment');
+      assert.ok(!texts.some(t => t.includes('#include')), 'Should not find #include as comment');
+      assert.ok(!texts.some(t => t.includes('#pragma')), 'Should not find #pragma as comment');
+    } finally {
+      try {
+        await vscode.workspace.fs.delete(testFileUri);
+      } catch (error) {
+        // Ignore delete error
+      }
+    }
   });
 });

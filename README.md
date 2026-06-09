@@ -105,9 +105,15 @@ The extension provides the following commands:
 
 ### Building
 
+To compile the TypeScript code:
 ```bash
 npm install
 npm run compile
+```
+
+To package the extension into a `.vsix` file for installation:
+```bash
+npm run vsix
 ```
 
 ### Code formatting

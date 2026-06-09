@@ -21,6 +21,13 @@ interface FileWithComments {
   comments: Comment[];
 }
 
+const CPP_EXTENSIONS = new Set([
+  'c', 'cpp', 'cc', 'cxx', 'c++',
+  'h', 'hpp', 'hh', 'hxx', 'h++',
+  'inl', 'i++', 'ii', 'ipp', 'ixx',
+  't++', 'tt', 'tpp', 'txx'
+]);
+
 /**
  * Data provider for the comment tree
  */
@@ -170,6 +177,8 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
       const lines = content.split('\n');
       const lowerCaseFilePath = filePath.toLowerCase();
       const isMarkdownFile = lowerCaseFilePath.endsWith('.md') || lowerCaseFilePath.endsWith('.markdown');
+      const ext = path.extname(lowerCaseFilePath).slice(1);
+      const isCppFile = CPP_EXTENSIONS.has(ext);
 
       // Search for single line comments
       for (let lineIndex = 0; lineIndex < lines.length; lineIndex++) {
@@ -186,8 +195,8 @@ export class CommentTreeProvider implements vscode.TreeDataProvider<vscode.TreeI
           });
         }
 
-        // Search for hash comments (skip for Markdown files where # denotes headings)
-        if (!isMarkdownFile) {
+        // Search for hash comments (skip for Markdown files where # denotes headings, and C/C++ files where # denotes preprocessor directives)
+        if (!isMarkdownFile && !isCppFile) {
           const hashMatch = line.match(/^(\s*)#(.*)/);
           if (hashMatch) {
             comments.push({
